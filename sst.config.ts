@@ -1,5 +1,6 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
+
 export default $config({
   app(input) {
     return {
@@ -10,17 +11,51 @@ export default $config({
     };
   },
   async run() {
+
     const vpc = new sst.aws.Vpc("MyVpc");
     const cluster = new sst.aws.Cluster("MyCluster", { vpc });
   
-    new sst.aws.Service("MyService", {
+    const service = new sst.aws.Service("MyService", {
       cluster,
       loadBalancer: {
-        ports: [{ listen: "80/http", forward: "4321/http" }],
+        rules: [{ listen: "80/http", forward: "4321/http" }],
       },
       dev: {
         command: "npm run dev",
       },
+      
+    });
+
+    new sst.aws.Router("MyServiceCDN", {
+      routes: {
+        "/*": {
+          // Point to your service's load balancer URL
+          url: service.url
+        }
+      },
+      transform: {  // This is just to transform the origin to http-only since load balancer is using http. 
+                    // This communication is between cloudfront and load balancer
+        cdn: (args) => {
+          // Use $resolve to unwrap the Input type
+          args.origins = $resolve(args.origins).apply(origins => {
+            // Now we can modify the origins array
+            return origins.map(origin => {
+              if (origin.customOriginConfig) {
+                return {
+                  ...origin,
+                  customOriginConfig: {
+                    ...origin.customOriginConfig,
+                    originProtocolPolicy: "http-only",
+                    originReadTimeout: 60,
+                    originKeepaliveTimeout: 60
+                  }
+                };
+              }
+              return origin;
+            });
+          });
+        }
+      }
     });
   }
 });

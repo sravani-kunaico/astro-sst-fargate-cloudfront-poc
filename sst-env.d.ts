@@ -10,6 +10,10 @@ declare module "sst" {
       "type": "sst.aws.Service"
       "url": string
     }
+    "MyServiceCDN": {
+      "type": "sst.aws.Router"
+      "url": string
+    }
     "MyVpc": {
       "type": "sst.aws.Vpc"
     }
