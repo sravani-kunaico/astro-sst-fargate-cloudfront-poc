@@ -15,11 +15,12 @@ export default $config({
     const vpc = new sst.aws.Vpc("MyVpc");
     const cluster = new sst.aws.Cluster("MyCluster", { vpc });
   
+    //Creates a Fargate service with a load balancer and a custom rule to forward the traffic to the container.
     const service = new sst.aws.Service("MyService", {
       cluster,
       loadBalancer: {
         rules: [{ listen: "80/http", forward: "4321/http" }],
-        public: false
+        public: false // Setting it to false disables the public access from internet
       },
       dev: {
         command: "npm run dev",
@@ -27,6 +28,7 @@ export default $config({
       
     });
 
+    // Creates a CDN to forward the traffic to the service's load balancer.
     new sst.aws.Router("MyServiceCDN", {
       routes: {
         "/*": {
