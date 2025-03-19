@@ -19,6 +19,7 @@ export default $config({
       cluster,
       loadBalancer: {
         rules: [{ listen: "80/http", forward: "4321/http" }],
+        public: false
       },
       dev: {
         command: "npm run dev",
