@@ -5,16 +5,25 @@
 
 declare module "sst" {
   export interface Resource {
-    "MyService": {
+    "MyBucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "MyFunction": {
+      "name": string
+      "type": "sst.aws.Function"
+      "url": string
+    }
+    "TestCDN": {
+      "type": "sst.aws.Router"
+      "url": string
+    }
+    "TestService": {
       "service": string
       "type": "sst.aws.Service"
       "url": string
     }
-    "MyServiceCDN": {
-      "type": "sst.aws.Router"
-      "url": string
-    }
-    "MyVpc": {
+    "TestVpc": {
       "type": "sst.aws.Vpc"
     }
   }
